@@ -5,7 +5,7 @@ const router = express.Router(); // Constante para gerar rota em arquivo diferen
 // Definido rotas
     // Rota principaldo administrador
     router.get('/', (req, res) => {
-        res.send("Página inicial do administrador");
+        res.render('admin/index'); // Retorna página 'index.handlebars'
     });
 
     // Rota para listagem de posts

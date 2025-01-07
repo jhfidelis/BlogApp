@@ -4,6 +4,7 @@ const handlebars = require('express-handlebars'); // Constante para receber o ex
 const bodyParser = require('body-parser'); // Constante para receber o body-parser
 const app = express(); // Constante que vai receber a função que vem do express
 const admin = require('./routes/admin'); // Constante para receber o arquivo 'admin.js'
+const path = require('path'); // Constante para poder trabalhar com diretórios
 //const mongoose = require('mongoose'); // Constante para receber o mongoose
 
 //Configurações
@@ -14,6 +15,9 @@ const admin = require('./routes/admin'); // Constante para receber o arquivo 'ad
     // Template engine (Handlebars)
     app.engine('handlebars', handlebars.engine({defaultLayout: 'main'}));
     app.set('view engine', 'handlebars');
+
+    // Public
+    app.use(express.static(path.join(__dirname, 'public'))); // Declarar a pasta de arquivos estáticos
 
 // Rotas
     // Rota principal da aplicação
