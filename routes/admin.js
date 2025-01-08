@@ -13,9 +13,14 @@ const router = express.Router(); // Constante para gerar rota em arquivo diferen
         res.send("Página de posts");
     });
 
-    // Rota para cadastrar categorias
+    // Rota para listar categorias
     router.get('/categorias', (req, res) => {
-        res.send("Página de categorias");
+        res.render('admin/categorias');
+    });
+
+    // Rota para adicionar categorias
+    router.get('/categorias/add', (req, res) => {
+        res.render('admin/add-categoria');
     });
 
 module.exports = router; //Exportanto constante para permitir o acesso de outros arquivos
