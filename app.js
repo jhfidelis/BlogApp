@@ -5,7 +5,7 @@ const bodyParser = require('body-parser'); // Constante para receber o body-pars
 const app = express(); // Constante que vai receber a função que vem do express
 const admin = require('./routes/admin'); // Constante para receber o arquivo 'admin.js'
 const path = require('path'); // Constante para poder trabalhar com diretórios
-//const mongoose = require('mongoose'); // Constante para receber o mongoose
+const mongoose = require('mongoose'); // Constante para receber o mongoose
 
 //Configurações
     // Body Parser
@@ -15,6 +15,14 @@ const path = require('path'); // Constante para poder trabalhar com diretórios
     // Template engine (Handlebars)
     app.engine('handlebars', handlebars.engine({defaultLayout: 'main'}));
     app.set('view engine', 'handlebars');
+
+    // Mongoose
+    mongoose.Promise = global.Promise; // evitar erros durante o processo de desenvolvimento de uma app
+    mongoose.connect("mongodb://localhost/BlogApp").then(() => {
+        console.log("MongoDB conectado com sucesso!");
+    }).catch((err) => {
+        console.log("Houve um erro ao se conectar com o MongoDB: " + err);
+    });
 
     // Public
     app.use(express.static(path.join(__dirname, 'public'))); // Declarar a pasta de arquivos estáticos
