@@ -6,8 +6,26 @@ const app = express(); // Constante que vai receber a função que vem do expres
 const admin = require('./routes/admin'); // Constante para receber o arquivo 'admin.js'
 const path = require('path'); // Constante para poder trabalhar com diretórios
 const mongoose = require('mongoose'); // Constante para receber o mongoose
+const session = require('express-session'); //Constante para receber o express-session
+const flash = require('connect-flash'); //Constante para receber o connect-flash
 
 //Configurações
+
+    // Sessão
+    app.use(session({
+        secret: "cursodenode", // chave para gerar uma sessão
+        resave: true, // Força a sessão a ser salva novamente no armazenamento mesmo sem modificações
+        saveUninitialized: true // Salva sessões não inicializadas (novas sessões) no armazenamento
+    })); // Função usada para criação e configuração de middlewares
+    app.use(flash()); // Configurando o flash
+
+    // Middleware
+    app.use((req, res, next) => {
+        res.locals.success_msg = req.flash("success_msg"); // Variável global para msg de sucesso
+        res.locals.error_msg = req.flash("error_msg"); // Variável global para msg de erro
+        next();
+    });
+
     // Body Parser
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(bodyParser.json());
