@@ -28,18 +28,40 @@ const Categoria = mongoose.model('categorias'); // Constante para acessar a cole
 
     // Rota para efetuar o registro de uma nova categoria
     router.post('/categorias/nova', (req, res) => {
-        // Constante para receber os dados do formulário
-        const novaCategoria = {
-            nome: req.body.nome,
-            slug: req.body.slug
-        };
 
-        // Salvando os dados obtido em novaCategoria no BD
-        new Categoria(novaCategoria).save().then(() => {
-            console.log("Categoria cadastrada com sucesso!");
-        }).catch((err) => {
-            console.log("Erro ao cadastrar categoria: " + err);
-        });
+        // Validando formulário
+        var erros = [];
+
+        if (!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null) {
+            erros.push({texto: "Nome inválido"});
+        }
+        if (!req.body.slug || typeof req.body.slug == undefined || req.body.slug == null) {
+            erros.push({texto: "Slug inválido"});
+        }
+        if (req.body.nome.length < 2) {
+            erros.push({texto: "Nome da categoria é muito pequeno"});
+        }
+
+        if(erros.length > 0) {
+            res.render('admin/add-categoria', {erros: erros});
+        }
+        else {
+            // Constante para receber os dados do formulário
+            const novaCategoria = {
+                nome: req.body.nome,
+                slug: req.body.slug
+            };
+
+            // Salvando os dados obtido em novaCategoria no BD
+            new Categoria(novaCategoria).save().then(() => {
+                req.flash('success_msg', "Categoria criada com sucesso!"); // Exibindo mesnagem de sucesso de criação de categoria
+                res.redirect('/admin/categorias'); // Redirecionando para a página de listagem de categorias
+            }).catch((err) => {
+                req.flash('error_msg', "Houve um erro ao salvar a categoria, tente novamente!");  
+                res.redirect('/admin');
+            });
+        }
+
     });
 
 module.exports = router; //Exportanto constante para permitir o acesso de outros arquivos
