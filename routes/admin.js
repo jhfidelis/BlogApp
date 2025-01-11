@@ -77,4 +77,37 @@ const Categoria = mongoose.model('categorias'); // Constante para acessar a cole
 
     });
 
+    // Rota para redirecionar para página de edição de categoria
+    router.get('/categorias/edit/:id', (req, res) => {
+        // Recuperar o conteúdo da categoria selecionada
+        Categoria.findOne({_id: req.params.id}).lean().then((categoria) => {
+            res.render('admin/edit-categoria', {categoria: categoria});
+        }).catch((err) => {
+            req.flash('error_msg', "Essa categoria não existe!");
+            res.redirect('/admin/categorias');
+        });
+    });
+
+    // Rota para aplicar as edições feitas pela categoria
+    router.post('/categorias/edit', (req, res) => {
+        console.log("ID recebido:", req.body.id); // Depuração do ID enviado
+        Categoria.findOne({_id: req.body.id}).then((categoria) => {
+            categoria.nome = req.body.nome;
+            categoria.slug = req.body.slug;
+
+            categoria.save().then(() => {
+                req.flash('success_msg', "Categoria editada com sucesso!");
+                res.redirect('/admin/categorias');
+            }).catch((err) => {
+                console.error("Erro ao salvar:"+ err); // Depuração do erro
+                req.flash('error_msg', "Houve um erro interno ao salvar a edição da categoria!");  
+                res.redirect('/admin/categorias');
+            });
+        }).catch((err) => {
+            console.error("Erro ao buscar categoria:"+ err); // Depuração do erro
+            req.flash('error_msg', "Houve um erro ao editar a categoria");
+            res.redirect('/admin/categorias');
+        });
+    });
+
 module.exports = router; //Exportanto constante para permitir o acesso de outros arquivos
