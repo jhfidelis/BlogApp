@@ -20,6 +20,13 @@ const Categoria = mongoose.model('categorias'); // Constante para acessar a cole
     router.get('/categorias', (req, res) => {
         // Função para listar todas as categorias que existem
         Categoria.find().lean().sort({data: 'desc'}).then((categorias) => {
+            // Formatar a data antes de passar para o template
+            categorias.forEach(categoria => {
+                if (categoria.data) {
+                    categoria.data = new Date(categoria.data).toLocaleDateString('pt-BR'); // Formato DD/MM/AAAA
+                }
+            });
+
             res.render('admin/categorias', {categorias: categorias});
         }).catch((err) => {
             req.flash('error_msg', "Houve um erro ao listar as categorias");
