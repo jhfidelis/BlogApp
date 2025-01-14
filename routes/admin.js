@@ -144,6 +144,22 @@ const Categoria = mongoose.model('categorias'); // Constante para acessar a cole
             req.flash('error_msg', "Houve um erro ao deletar a categoria");
             res.redirect('/admin/categorias');
         });
-    })
+    });
+
+    // Rota para exibição das postagens
+    router.get('/postagens', (req, res) => {
+        res.render('admin/postagens');
+    });
+
+    // Rota para adcionar postagem
+    router.get('/postagens/add', (req, res) => {
+        Categoria.find().lean().then((categorias) => { // Passando todas as categorias exixtêntes para a view add-postagem
+            res.render('admin/add-postagem', {categorias: categorias});
+        }).catch((err) => {
+            req.flash('error_msg', "Houve um erro ao carregar a página");
+            res.redirect('/admin');
+        });
+        
+    });
 
 module.exports = router; //Exportanto constante para permitir o acesso de outros arquivos
