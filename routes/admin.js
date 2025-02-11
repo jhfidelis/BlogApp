@@ -166,8 +166,22 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
 
     // Rota para efetuar o registro de uma nova postagem
     router.post("/postagens/nova", (req, res) => {
+        // Validando erros
         var erros = [];
 
+        if (!req.body.titulo || typeof req.body.titulo == undefined || req.body.titulo == null) {
+            erros.push({texto: "Título inválido"});
+        }
+        if (!req.body.slug || typeof req.body.slug == undefined || req.body.slug == null) {
+            erros.push({texto: "Slug inválido"});
+        }
+        if (!req.body.descricao || typeof req.body.descricao == undefined || req.body.descricao == null) {
+            erros.push({texto: "Descrição inválido"});
+        }
+        if (!req.body.conteudo || typeof req.body.conteudo == undefined || req.body.conteudo == null) {
+            erros.push({texto: "Conteúdo inválido"});
+        }
+        
         // Verificando a categoria que o usuário selecionou
         if (req.body.categoria == "0") {
             erros.push({texto: "Categoria inválida! Registre uma categoria para realizar uma postagem."});
