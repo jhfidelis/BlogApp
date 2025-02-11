@@ -4,6 +4,8 @@ const router = express.Router(); // Constante para gerar rota em arquivo diferen
 const mongoose = require('mongoose'); // Constante para receber o mongoose
 require('../models/Categoria'); // Carrega o modelo de dados da Categoria para uso no arquivo
 const Categoria = mongoose.model('categorias'); // Constante para acessar a coleção 'categorias' no banco de dados
+require('../models/Postagem'); // Carrega o modelo de dados da Postagem para uso no arquivo
+const Postagem = mongoose.model('postagens'); // Constante para acessar a coleção 'postagens' no banco de dados
 
 // Definido rotas
     // Rota principaldo administrador
@@ -160,6 +162,37 @@ const Categoria = mongoose.model('categorias'); // Constante para acessar a cole
             res.redirect('/admin');
         });
         
+    });
+
+    // Rota para efetuar o registro de uma nova postagem
+    router.post("/postagens/nova", (req, res) => {
+        var erros = [];
+
+        // Verificando a categoria que o usuário selecionou
+        if (req.body.categoria == "0") {
+            erros.push({texto: "Categoria inválida! Registre uma categoria para realizar uma postagem."});
+        }
+
+        if (erros.length > 0) {
+            res.render('admin/add-postagem', {erros: erros});
+        } else {
+            const novaPostagem = {
+                titulo: req.body.titulo,
+                slug: req.body.slug,
+                descricao: req.body.descricao,
+                conteudo: req.body.conteudo,
+                categoria: req.body.categoria
+            }
+
+            new Postagem(novaPostagem).save().then(() => {
+                req.flash("success_msg", "Postagem criada com sucesso!");
+                res.redirect("/admin/postagens");
+            }).catch((err) => {
+                req.flash("error_msg", "Houve um erro durante o salvamento da postagem.");
+                console.log(err);
+                res.redirect("/admin/postagens");
+            });
+        }
     });
 
 module.exports = router; //Exportanto constante para permitir o acesso de outros arquivos
