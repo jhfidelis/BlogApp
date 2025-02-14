@@ -181,7 +181,7 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
             erros.push({texto: "Slug inválido"});
         }
         if (!req.body.descricao || typeof req.body.descricao == undefined || req.body.descricao == null) {
-            erros.push({texto: "Descrição inválido"});
+            erros.push({texto: "Descrição inválida"});
         }
         if (!req.body.conteudo || typeof req.body.conteudo == undefined || req.body.conteudo == null) {
             erros.push({texto: "Conteúdo inválido"});
@@ -234,26 +234,57 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
 
    // Rota para aplicar as edições feitas pela categoria
    router.post('/postagens/edit', (req, res) => {
-    // Buscando uma postagem que tenha o id igual ao que foi passado na requisição
-    Postagem.findOne({_id: req.body.id}).then((postagem) => {
-        postagem.titulo = req.body.titulo;
-        postagem.slug = req.body.slug;
-        postagem.descricao = req.body.descricao;
-        postagem.conteudo = req.body.conteudo;
-        postagem.categoria = req.body.categoria;
+        // Validando formulário
+        var erros = [];
 
-        postagem.save().then(() => {
-            req.flash('success_msg', "Postagem editada com sucesso");
-            res.redirect('/admin/postagens');
-        }).catch((err) => {
-            req.flash('error_msg', "Erro interno");
-            res.redirect('/admin/postagens');
-        });
-    }).catch((err) => {
-        console.log(err);
-        req.flash('error_msg', "Houve um erro ao salvar a edição.");
-        res.redirect('/admin/postagens');
-    });
+        if (!req.body.titulo || typeof req.body.titulo == undefined || req.body.titulo == null) {
+            erros.push({texto: "Título inválido"});
+        }
+        if (!req.body.slug || typeof req.body.slug == undefined || req.body.slug == null) {
+            erros.push({texto: "Slug inválido"});
+        }
+        if (!req.body.descricao || typeof req.body.descricao == undefined || req.body.descricao == null) {
+            erros.push({texto: "Descrição inválida"});
+        }
+        if (!req.body.conteudo || typeof req.body.conteudo == undefined || req.body.conteudo == null) {
+            erros.push({texto: "Conteúdo inválido"});
+        }
+
+        if (erros.length > 0) {
+            // Retornando os valores salvos no formulário
+            res.render('admin/edit-postagem', {
+                erros: erros,
+                postagem: {
+                    //_id: req.body.id,
+                    titulo: req.body.titulo,
+                    slug: req.body.slug,
+                    descricao: req.body.descricao,
+                    conteudo: req.body.conteudo,
+                    categoria: req.body.categoria
+                }
+            });
+        } else {
+            // Buscando uma postagem que tenha o id igual ao que foi passado na requisição
+            Postagem.findOne({_id: req.body.id}).then((postagem) => {
+                postagem.titulo = req.body.titulo;
+                postagem.slug = req.body.slug;
+                postagem.descricao = req.body.descricao;
+                postagem.conteudo = req.body.conteudo;
+                postagem.categoria = req.body.categoria;
+
+                postagem.save().then(() => {
+                    req.flash('success_msg', "Postagem editada com sucesso");
+                    res.redirect('/admin/postagens');
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro interno");
+                    res.redirect('/admin/postagens');
+                });
+            }).catch((err) => {
+                console.log(err);
+                req.flash('error_msg', "Houve um erro ao salvar a edição.");
+                res.redirect('/admin/postagens');
+            });
+        }
    });
 
 module.exports = router; //Exportanto constante para permitir o acesso de outros arquivos
