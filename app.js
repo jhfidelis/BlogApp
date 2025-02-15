@@ -8,6 +8,8 @@ const path = require('path'); // Constante para poder trabalhar com diretórios
 const mongoose = require('mongoose'); // Constante para receber o mongoose
 const session = require('express-session'); //Constante para receber o express-session
 const flash = require('connect-flash'); //Constante para receber o connect-flash
+require('./models/Postagem'); // Carregando o model de postagens
+const Postagem = mongoose.model('postagens') // Constante para declarar o model de postagens
 
 //Configurações
 
@@ -48,7 +50,17 @@ const flash = require('connect-flash'); //Constante para receber o connect-flash
 // Rotas
     // Rota principal da aplicação
     app.get('/', (req, res) => {
-        res.send("Rota principal");
+        Postagem.find().lean().populate('categoria').sort({data: 'desc'}).then((postagens) => {
+            res.render('index', {postagens: postagens}); // Renderizando a página principal
+        }).catch((err) => {
+            req.flash('error_msg', "Houve um erro interno ao carregar as postagens");
+            res.redirect('/404');
+        });
+    });
+
+    // Rota para ser exibida em casos de erro
+    app.get('/404', (req, res) => {
+        res.send("Erro 404!");
     });
 
     // Rota para listagem de posts
