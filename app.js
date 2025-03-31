@@ -10,6 +10,8 @@ const session = require('express-session'); //Constante para receber o express-s
 const flash = require('connect-flash'); //Constante para receber o connect-flash
 require('./models/Postagem'); // Carregando o model de postagens
 const Postagem = mongoose.model('postagens') // Constante para declarar o model de postagens
+require('./models/Categoria'); // Carregando o model de categorias
+const Categoria = mongoose.model('categorias'); // Constante para declarar o model de postagens
 
 //Configurações
 
@@ -73,14 +75,41 @@ const Postagem = mongoose.model('postagens') // Constante para declarar o model 
         });
     });
 
+    // Rota para listar as categorias
+    app.get('/categorias', (req, res) => {
+        Categoria.find().lean().then((categorias) => {
+            res.render('categorias/index', {categorias: categorias});
+        }).catch((err) => {
+            req.flash('error_msg', "Houve um erro interno ao listar as categorias");
+            res.redirect('/');
+        });
+    });
+
+    // Rota para pesquisar uma categoria específica
+    app.get('/categorias/:slug', (req, res) => {
+        Categoria.findOne({slug: req.params.slug}).lean().then((categoria) => {
+            
+            if (categoria) {
+                Postagem.find({categoria: categoria._id}).lean().then((postagens) => { // Pesquisa as postagens que pertencem a categoria passada no slug
+                    res.render('categorias/postagens', {postagens: postagens, categoria: categoria});
+                }).catch((err) => {
+                    req.flash('error_msg', "Houve um erro ao listar as postagens!");
+                    res.redirect('/');
+                });
+            } else {
+                req.flash('error_msg', "Esta categoria não existe!");
+                res.redirect('/');
+            }
+
+        }).catch((err) => {
+            req.flash('error_msg', "Houve um erro interno ao carregar a página desta categoria!");
+            res.redirect('/');
+        });
+    });
+
     // Rota para ser exibida em casos de erro
     app.get('/404', (req, res) => {
         res.send("Erro 404!");
-    });
-
-    // Rota para listagem de posts
-    app.get('/posts', (req, res) => {
-        res.send("Lista de Posts");
     });
 
     // Criando um 'prefixo' para rota admin
