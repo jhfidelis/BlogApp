@@ -12,6 +12,7 @@ require('./models/Postagem'); // Carregando o model de postagens
 const Postagem = mongoose.model('postagens') // Constante para declarar o model de postagens
 require('./models/Categoria'); // Carregando o model de categorias
 const Categoria = mongoose.model('categorias'); // Constante para declarar o model de postagens
+const usuarios = require('./routes/usuario'); // importando a rota de usuários
 
 //Configurações
 
@@ -114,6 +115,9 @@ const Categoria = mongoose.model('categorias'); // Constante para declarar o mod
 
     // Criando um 'prefixo' para rota admin
     app.use('/admin', admin);
+
+    // Chamando a rota de registros
+    app.use('/usuarios', usuarios);
 
 //Outros
 const PORT = 8081; // Constante para receber a porta que será utilizada pelo servidor
