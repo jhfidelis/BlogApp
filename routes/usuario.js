@@ -80,4 +80,9 @@ router.post('/registro', (req, res) => {
 
 });
 
+// Rota para realizar o login do usuário
+router.get('/login', (req, res) => {
+    res.render('usuarios/login');
+});
+
 module.exports = router; // Exportanto constante para permitir o acesso de outros arquivos
