@@ -4,6 +4,7 @@ const router = express.Router(); // Constante para gerar rota em arquivo diferen
 const mongoose = require('mongoose'); // Constante para receber o mongoose
 require('../models/Usuario'); // Carrega o modelo de dados do Usuario para uso no arquivo
 const Usuario = mongoose.model('usuarios'); // Constante para acessar a coleção 'usuarios' no banco de dados
+const bcrypt = require('bcryptjs'); // Constante para importar o bcrypt
 
 // Rota para renderizar uma view
 router.get('/registro', (req, res) => {
@@ -39,7 +40,42 @@ router.post('/registro', (req, res) => {
     if (erros.length > 0) {
         res.render('usuarios/registro', {erros: erros});
     } else {
-        // A fazer
+        Usuario.findOne({email: req.body.email}).lean().then((usuario) => {
+            // Verificar se  já existe um usuário com o e-mail a ser cadastrado
+            if (usuario) {
+                req.flash('error_msg', "Já existe uma conta com esse e-mail");
+                res.redirect('/usuarios/registro');
+            } else {
+                const novoUsuario = new Usuario({
+                    nome: req.body.nome,
+                    email: req.body.email,
+                    senha: req.body.senha
+                });
+
+                // Criptografando a senha
+                bcrypt.genSalt(10, (erro, salt) => {
+                    bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                        if(erro) {
+                            req.flash('error_msg', "Houve um erro ao cadastrar o usuário");
+                            res.redirect('/');
+                        } else {
+                            novoUsuario.senha = hash; // Hash sendo inserido no campo senha
+
+                            novoUsuario.save().then(() => {
+                                req.flash('success_msg', "Usuário cadastrado com sucesso!");
+                                res.redirect('/');
+                            }).catch((err) => {
+                                req.flash('error_msg', "Houve um erro ao cadastrar o usuário, tente novamente");
+                                res.redirect('/usuarios/registro');
+                            });
+                        }
+                    });
+                });
+            }
+        }).catch((err) => {
+            req.flash('error_msg', "Houve um erro interno");
+            res.redirect('/');
+        });
     }
 
 });
