@@ -13,6 +13,8 @@ const Postagem = mongoose.model('postagens') // Constante para declarar o model 
 require('./models/Categoria'); // Carregando o model de categorias
 const Categoria = mongoose.model('categorias'); // Constante para declarar o model de postagens
 const usuarios = require('./routes/usuario'); // importando a rota de usuários
+const passport = require('passport'); // Constante para receber o passport
+require('./config/auth');// Chamando o arquivo auth.js
 
 //Configurações
 
@@ -22,6 +24,8 @@ const usuarios = require('./routes/usuario'); // importando a rota de usuários
         resave: true, // Força a sessão a ser salva novamente no armazenamento mesmo sem modificações
         saveUninitialized: true // Salva sessões não inicializadas (novas sessões) no armazenamento
     })); // Função usada para criação e configuração de middlewares
+    app.use(passport.initialize()); // Inicializa o Passport para autenticação
+    app.use(passport.session()); // Configura o Passport para gerenciar sessões de login
     app.use(flash()); // Configurando o flash
 
     // Middleware
