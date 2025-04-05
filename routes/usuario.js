@@ -97,4 +97,18 @@ router.post('/login', (req, res, next) => {
 
 });
 
+// Rota para fazer logout do usuário
+router.get('/logout', (req, res, next) => {
+    
+    req.logout(function(err) {
+        if (err) {
+            return next(err); // Passa o erro para o middleware de tratamento
+        }
+
+        req.flash('success_msg', "Sessão encerrada!");
+        res.redirect('/');
+    });
+
+});
+
 module.exports = router; // Exportanto constante para permitir o acesso de outros arquivos
