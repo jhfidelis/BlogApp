@@ -6,20 +6,21 @@ require('../models/Categoria'); // Carrega o modelo de dados da Categoria para u
 const Categoria = mongoose.model('categorias'); // Constante para acessar a coleção 'categorias' no banco de dados
 require('../models/Postagem'); // Carrega o modelo de dados da Postagem para uso no arquivo
 const Postagem = mongoose.model('postagens'); // Constante para acessar a coleção 'postagens' no banco de dados
+const {isAdmin} = require('../helpers/isAdmin'); // constante para carregar o helper isAdmin
 
 // Definido rotas
     // Rota principaldo administrador
-    router.get('/', (req, res) => {
+    router.get('/', isAdmin, (req, res) => {
         res.render('admin/index'); // Retorna página 'index.handlebars'
     });
 
     // Rota para listagem de posts
-    router.get('/posts', (req, res) => {
+    router.get('/posts', isAdmin, (req, res) => {
         res.send("Página de posts");
     });
 
     // Rota para listar categorias
-    router.get('/categorias', (req, res) => {
+    router.get('/categorias', isAdmin, (req, res) => {
         // Função para listar todas as categorias que existem
         Categoria.find().lean().sort({data: 'desc'}).then((categorias) => {
             // Formatar a data antes de passar para o template
@@ -37,12 +38,12 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
     });
 
     // Rota para adicionar categorias
-    router.get('/categorias/add', (req, res) => {
+    router.get('/categorias/add', isAdmin, (req, res) => {
         res.render('admin/add-categoria');
     });
 
     // Rota para efetuar o registro de uma nova categoria
-    router.post('/categorias/nova', (req, res) => {
+    router.post('/categorias/nova', isAdmin, (req, res) => {
 
         // Validando formulário
         var erros = [];
@@ -80,7 +81,7 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
     });
 
     // Rota para redirecionar para página de edição de categoria
-    router.get('/categorias/edit/:id', (req, res) => {
+    router.get('/categorias/edit/:id', isAdmin, (req, res) => {
         // Recuperar o conteúdo da categoria selecionada
         Categoria.findOne({_id: req.params.id}).lean().then((categoria) => {
             res.render('admin/edit-categoria', {categoria: categoria});
@@ -91,7 +92,7 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
     });
 
     // Rota para aplicar as edições feitas pela categoria
-    router.post('/categorias/edit', (req, res) => {
+    router.post('/categorias/edit', isAdmin, (req, res) => {
 
          // Validando formulário
          var erros = [];
@@ -138,7 +139,7 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
     });
 
     // Rota para deletar uma categoria
-    router.post('/categorias/deletar', (req, res) => {
+    router.post('/categorias/deletar', isAdmin, (req, res) => {
         Categoria.deleteOne({_id: req.body.id}).then(() => {
             req.flash('success_msg', "Catergoria deletada com sucesso!");
             res.redirect('/admin/categorias');
@@ -149,7 +150,7 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
     });
 
     // Rota para exibição das postagens
-    router.get('/postagens', (req, res) => {
+    router.get('/postagens', isAdmin, (req, res) => {
         Postagem.find().lean().populate("categoria").sort({data: "desc"}).then((postagens) => {
             res.render('admin/postagens', {postagens: postagens});
         }).catch((err) => {
@@ -159,7 +160,7 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
     });
 
     // Rota para adcionar postagem
-    router.get('/postagens/add', (req, res) => {
+    router.get('/postagens/add', isAdmin, (req, res) => {
         Categoria.find().lean().then((categorias) => { // Passando todas as categorias exixtêntes para a view add-postagem
             res.render('admin/add-postagem', {categorias: categorias});
         }).catch((err) => {
@@ -170,7 +171,7 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
     });
 
     // Rota para efetuar o registro de uma nova postagem
-    router.post("/postagens/nova", (req, res) => {
+    router.post("/postagens/nova", isAdmin, (req, res) => {
         // Validando erros
         var erros = [];
 
@@ -215,7 +216,7 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
     });
 
     // Rota para redirecionar para página de edição de postagem
-    router.get('/postagens/edit/:id', (req, res) => {
+    router.get('/postagens/edit/:id', isAdmin, (req, res) => {
         // Recuperar o conteúdo da postagem selecionada
         Postagem.findOne({_id: req.params.id}).lean().then((postagem) => {
             // Recuperar as categorias no banco de dados
@@ -233,7 +234,7 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
    });
 
    // Rota para aplicar as edições feitas pela categoria
-   router.post('/postagens/edit', (req, res) => {
+   router.post('/postagens/edit', isAdmin, (req, res) => {
         // Validando formulário
         var erros = [];
 
@@ -288,7 +289,7 @@ const Postagem = mongoose.model('postagens'); // Constante para acessar a coleç
    });
 
    // Rota para deletar uma postagem
-   router.get('/postagens/deletar/:id', (req, res) => {
+   router.get('/postagens/deletar/:id', isAdmin, (req, res) => {
     Postagem.deleteOne({_id: req.params.id}).then(() => {
         req.flash('success_msg', "Postagem deletada com sucesso!");
         res.redirect('/admin/postagens');

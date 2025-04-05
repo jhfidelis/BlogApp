@@ -33,6 +33,7 @@ require('./config/auth')(passport);// Chamando o arquivo auth.js
         res.locals.success_msg = req.flash("success_msg"); // Variável global para msg de sucesso
         res.locals.error_msg = req.flash("error_msg"); // Variável global para msg de erro
         res.locals.error = req.flash("error"); // Variável global para exibir mensagem de erro no login
+        res.locals.user = req.user || null;// Variável global para armazenar os dados do usuário autenticado
         next();
     });
 
