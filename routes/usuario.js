@@ -5,6 +5,7 @@ const mongoose = require('mongoose'); // Constante para receber o mongoose
 require('../models/Usuario'); // Carrega o modelo de dados do Usuario para uso no arquivo
 const Usuario = mongoose.model('usuarios'); // Constante para acessar a coleção 'usuarios' no banco de dados
 const bcrypt = require('bcryptjs'); // Constante para importar o bcrypt
+const passport = require('passport'); // Constante para carregar o passport
 
 // Rota para renderizar uma view
 router.get('/registro', (req, res) => {
@@ -83,6 +84,17 @@ router.post('/registro', (req, res) => {
 // Rota para realizar o login do usuário
 router.get('/login', (req, res) => {
     res.render('usuarios/login');
+});
+
+// Rota de autenticação
+router.post('/login', (req, res, next) => {
+    // Função utilizada para realizar qualquer tipo de autenticação
+    passport.authenticate(/*tipo de autenticação*/ "local" , {
+        successRedirect: '/',
+        failureRedirect: '/usuarios/login',
+        failureFlash: true
+    })(req, res, next);
+
 });
 
 module.exports = router; // Exportanto constante para permitir o acesso de outros arquivos

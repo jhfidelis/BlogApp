@@ -14,7 +14,7 @@ require('./models/Categoria'); // Carregando o model de categorias
 const Categoria = mongoose.model('categorias'); // Constante para declarar o model de postagens
 const usuarios = require('./routes/usuario'); // importando a rota de usuários
 const passport = require('passport'); // Constante para receber o passport
-require('./config/auth');// Chamando o arquivo auth.js
+require('./config/auth')(passport);// Chamando o arquivo auth.js
 
 //Configurações
 
@@ -32,6 +32,7 @@ require('./config/auth');// Chamando o arquivo auth.js
     app.use((req, res, next) => {
         res.locals.success_msg = req.flash("success_msg"); // Variável global para msg de sucesso
         res.locals.error_msg = req.flash("error_msg"); // Variável global para msg de erro
+        res.locals.error = req.flash("error"); // Variável global para exibir mensagem de erro no login
         next();
     });
 

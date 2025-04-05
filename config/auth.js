@@ -9,9 +9,9 @@ const Usuario = mongoose.model('usuarios'); // Constante para acessar a coleçã
 // Configuração do sistema de autenticação
 module.exports = function(passport) {
 
-    passport.use(new localStrategy({usernameField: 'email'}, (email, senha, done) => {
+    passport.use(new localStrategy({usernameField: 'email', passwordField: 'senha'}, (email, senha, done) => {
         // Busca o usuário no banco de dados pelo email
-        Usuario.findOne({email: email}).lean().then((usuario) => {
+        Usuario.findOne({email: email}).then((usuario) => {
             
             if (!usuario) {
                 return done(null, false, {message: "Esta conta não existe"});
@@ -20,7 +20,7 @@ module.exports = function(passport) {
             // Compara a senha informada com a senha armazenada no banco
             bcrypt.compare(senha, usuario.senha, (erro, senhaCorreta) => {
                 if(senhaCorreta) {
-                    return done(null, user); // Se a senha estiver correta, autentica o usuário
+                    return done(null, usuario); // Se a senha estiver correta, autentica o usuário
                 } else {
                     return done(null, false, {message: "Senha incorreta"});
                 }
@@ -36,8 +36,10 @@ module.exports = function(passport) {
 
     // Recupera os dados do usuário a partir do ID salvo na sessão
     passport.deserializeUser((id, done) => {
-        User.findById(id, (err, usuario) => {
-            done(err, user)
+        Usuario.findById(id).then((usuario) => {
+            done(null, usuario);
+        }).catch((err) => {
+            done(err, null);
         });
     });
 
